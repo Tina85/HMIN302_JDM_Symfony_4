@@ -1,0 +1,149 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello JDMServerController!{% endblock %}
+
+{% block body %}
+<div class="jumbotron" style="margin-top: 0px;">
+	<div class="container">
+		<a  href="{{ path('jdm_server')}}">    
+			<img class="rounded mx-auto d-block" src='images/jdm.png' width="40%" height="45%" >
+		</a>
+
+		<form action="search-term" method="get" style="margin-top: 15px;">
+			<div class= "row justify-content-sm-center">
+				<input class="form-control col-lg-7 col-md-7 col-sm-7 col-xs-2" type="search" name="term" placeholder="Tapez un terme ...">
+				<button type="submit" class="btn btn-success">
+					<i class="fa fa-search"></i>
+				</button>
+			</div>
+		</form>
+	</div>
+</div>
+
+
+{% if (term != " ") %}
+
+	<div class="container">
+		<div class="row">
+			<div class="col-sm-9">
+				<h2>Terme recherché: <strong>{{term|replace({'+': ' '}) }}</strong></h2>
+			</div>
+			<div class="col-sm-3">
+				<button class="btn btn-secondary btn-lg" type="button" data-toggle="collapse" data-target="#{{term}}" aria-expanded="false" aria-controls="{{term}}">Afficher les définitions</button>
+			</div>
+		</div>
+		<div class="row">
+		  <div class="col">
+		    <div class="collapse multi-collapse" id="{{term}}">
+		      <div class="card card-body bg-light">
+		        {% for def in content.defs%}
+		        	<p>{{def}}</p>
+		        {% endfor%}
+		      </div>
+		    </div>
+		  </div>
+		</div>
+	<div class="mt-2 col-md-13">
+		<div class="table-responsive">
+		<table class="table " data-pagination="true">
+		  <thead>
+		    <tr class="table-success">
+		      <th scope="col">#</th>
+		      <th scope="col">Type de relation</th>
+		      <th scope="col">Nom complet</th>
+		      <th scope="col">Help!</th>
+		      <th scope="col"></th>
+		    </tr>
+		  </thead>
+		  <tbody>
+		  	{% for rt in content.rts %}
+			    <tr >
+			      <th scope="row">{{ loop.index }}</th>
+			      <td>{{rt.trname}}</td>
+			      <td>{{rt.trgpname}}</td>
+			      <td>
+			      	<acronym title="{{rt.rthelp}}">{{rt.rthelp|slice(0, 35)}}...</acronym>
+			      </td>
+			      <td>
+  					<button class="btn btn-outline-success" type="button" data-toggle="collapse" data-target="#{{rt.rtid}}" aria-expanded="false" aria-controls="{{rt.rtid}}">Voir les relations</button>
+			      </td>
+			  </tr>
+			  
+			  <tr >
+			  	<td colspan="5">
+					<div class="collapse multi-collapse" id="{{rt.rtid}}">
+						<div class="card card-body ">
+							<div class="table-responsive">
+					        <table class="table ">
+					        <legend> <b>Relations sortantes </b></legend>
+							  <thead>
+							    <tr >
+							      <th scope="col">N°Rel</th>
+							      <th scope="col">Noeud</th>
+							      <th scope="col">Poids</th>
+							    </tr>
+							  </thead>
+							  <tbody>
+							  	{% for rel_out in content.rels_out %}
+							  	{% if rel_out.type == rt.rtid %}
+							  	<tr class="table-secondary">
+							      <th scope="row">{{ loop.index }}</th>
+							      <td><a href="search-term?term={{rel_out.node2}}">{{rel_out.node2}}</a></td>
+							      <td>{{rel_out.w}}</td>
+							  	</tr>
+							  	{%endif%}
+							  {% endfor %}
+							</tbody>
+						</table>
+					</div>
+						<table class="table ">
+					        <legend> <b>Relations entrantes </b></legend>
+							  <thead>
+							    <tr >
+							      <th scope="col">N°Rel</th>
+							      <th scope="col">Noeud</th>
+							      <th scope="col">Poids</th>
+							    </tr>
+							  </thead>
+							  <tbody>
+							  	{% for rel_in in content.rels_in %}
+							  	{% if rel_in.type == rt.rtid %}
+							  	<tr class="table-secondary">
+							      <th scope="row">{{ loop.index }}</th>
+							      <td><a href="search-term?term={{rel_in.node1}}">{{rel_in.node1}}</a></td>
+							      <td>{{rel_in.w}}</td>
+							  	</tr>
+							  	{%endif%}
+							  {% endfor %}
+							</tbody>
+						</table>
+					    </div>
+					</div>
+				</td>
+			  </tr>
+			  
+		   	{% endfor %}
+		  </tbody>
+		</table>
+	</div>
+
+	</div>
+	
+	<h1>--</h1>
+</div>
+
+{% endif%}
+{% endblock %}
+
+{% block javascripts %}
+
+<script type="text/javascript"></script>
+<script type="text/javascript">
+
+	function btn_delete($rtid){
+		alert("hello "+$rtid);
+	}
+</script>
+
+
+{% endblock %}
